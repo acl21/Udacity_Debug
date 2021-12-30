@@ -52,15 +52,21 @@ class DecoderRNN(nn.Module):
     def forward(self, features, captions):
         ''' Define the feedforward behavior of the model.'''
         # create embedded word vectors for each word in a sentence
-        embeds = self.word_embeddings(captions)
+        print(features.size())
+        print(captions.size())
+        features_long=features.long()
+        stacks=torch.cat([features_long, captions], dim=1)
+        print(stacks.shape)
+
+        embeds = self.word_embeddings(stacks)
         
         # get the output and hidden state by passing the lstm over our word embeddings
         # the lstm takes in our embeddings and hiddent state
         lstm_out, self.hidden = self.lstm(
-            embeds.view(len(captions), 1, -1), self.hidden)
+            embeds.view(len(stacks), 1, -1), self.hidden)
         
         # get the scores for the most likely tag for a word
-        caption_outputs = self.hidden2caption(lstm_out.view(len(captions), -1))
+        caption_outputs = self.hidden2caption(lstm_out.view(len(stacks), -1))
         caption_scores = F.log_softmax(caption_outputs, dim=1)
         
         return caption_scores
