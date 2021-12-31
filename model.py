@@ -63,7 +63,7 @@ class DecoderRNN(nn.Module):
         # get the output and hidden state by passing the lstm over our word embeddings
         # the lstm takes in our embeddings and hiddent state
         lstm_out, self.hidden = self.lstm(
-            embeds.view(len(stacks), 1, -1), self.hidden)
+            embeds.view(stacks.shape[0]*stacks.shape[1], 1, -1), self.hidden)
         
         # get the scores for the most likely tag for a word
         caption_outputs = self.hidden2caption(lstm_out.view(len(stacks), -1))
