@@ -24,7 +24,7 @@ class EncoderCNN(nn.Module):
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers=1):
         super(DecoderRNN, self).__init__()
-        
+        self.embed_size = embed_size
         self.hidden_size = hidden_size
 
         # embedding layer that turns words into a vector of a specified size
@@ -46,8 +46,8 @@ class DecoderRNN(nn.Module):
            there will be none because the hidden state is formed based on perviously seen data.
            So, this function defines a hidden state with all zeroes and of a specified size.'''
         # The axes dimensions are (n_layers, batch_size, hidden_size)
-        return (torch.zeros(1, 1, self.hidden_size),
-                torch.zeros(1, 1, self.hidden_size))
+        return (torch.zeros(1, self.embed_size, self.hidden_size),
+                torch.zeros(1, self.embed_size, self.hidden_size))
     
     def forward(self, features, captions):
         ''' Define the feedforward behavior of the model.'''
@@ -63,7 +63,7 @@ class DecoderRNN(nn.Module):
         # get the output and hidden state by passing the lstm over our word embeddings
         # the lstm takes in our embeddings and hiddent state
         lstm_out, self.hidden = self.lstm(
-            embeds.view(stacks.shape[0]*stacks.shape[1], 1, -1), self.hidden)
+            embeds.view(stacks.shape[0],stacks.shape[1], -1), self.hidden)
         
         # get the scores for the most likely tag for a word
         caption_outputs = self.hidden2caption(lstm_out.view(len(stacks), -1))
