@@ -54,16 +54,16 @@ class DecoderRNN(nn.Module):
         # create embedded word vectors for each word in a sentence
         print(features.size())
         print(captions.size())
-        features_long=features.long()
-        stacks=torch.cat([features_long, captions], dim=1)
-        print(stacks.shape)
+        #features_long=features.long()
 
-        embeds = self.word_embeddings(stacks)
-        
+        embeds = self.word_embeddings(captions)
+        print(embeds.shape)
+        stacks=torch.cat([features, embeds], dim=1)
+        print(stacks.shape)        
         # get the output and hidden state by passing the lstm over our word embeddings
         # the lstm takes in our embeddings and hiddent state
         lstm_out, self.hidden = self.lstm(
-            embeds.view(stacks.shape[0],stacks.shape[1], -1), self.hidden)
+            stacks.view(stacks.shape[0],stacks.shape[1], -1), self.hidden)
         
         # get the scores for the most likely tag for a word
         caption_outputs = self.hidden2caption(lstm_out.view(len(stacks), -1))
