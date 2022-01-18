@@ -48,8 +48,8 @@ class DecoderRNN(nn.Module):
            there will be none because the hidden state is formed based on perviously seen data.
            So, this function defines a hidden state with all zeroes and of a specified size.'''
         # The axes dimensions are (n_layers, batch_size, hidden_size)
-        return (torch.zeros(1, self.caption_size + 1, self.hidden_size),
-                torch.zeros(1, self.caption_size + 1, self.hidden_size))
+        return (torch.zeros(1, self.caption_size, self.hidden_size),
+                torch.zeros(1, self.caption_size, self.hidden_size))
     
     def forward(self, features, captions):
         ''' Define the feedforward behavior of the model.'''
@@ -58,7 +58,8 @@ class DecoderRNN(nn.Module):
         print(captions.size())
         #features_long=features.long()
         features = features.view(-1, 1, self.embed_size)
-        embeds = self.word_embeddings(captions)
+        #embeds = self.word_embeddings(captions)
+        embeds = self.word_embeddings(captions[:,:-1])
         print(embeds.shape)
         stacks=torch.cat([features, embeds], dim=1)
         print(stacks.shape)        
